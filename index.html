@@ -3,55 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - Your Name</title>
-    <link rel="stylesheet" href="p.css">
+    <title>Video Prediction</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 20px;
+        }
 
+        .container {
+            width: 60%;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00796b;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        #video-preview {
+            margin-bottom: 20px;
+        }
+
+        #video-player {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .progress-item {
+            width: 45%;
+        }
+
+        #progress-meter1, #progress-meter2 {
+            width: 100%;
+            height: 30px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #00796b, #004d40);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #prediction-result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        #predict-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 5px #004d40;
+        }
+
+        #predict-button:hover {
+            background-color: #004d40;
+            box-shadow: 0 8px #004d40;
+        }
+    </style>
 </head>
 <body>
-    <header>
-
-    </header>
-
-    <main>
-        <section id="intro">
-            <h1>Welcome to My Portfolio</h1>
-            <p>Hi, I'm Your Helper , a Nextalk.</p>
-            <button>Contact Me</button>
-        </section>
-
-        <section id="user-form">
-            <h2>Add Your Details</h2>
-            <form>
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-
-                <label for="message">Message:</label>
-                <textarea id="message" name="message" rows="4" required></textarea>
-
-                <button type="submit">Submit</button>
-            </form>
-        </section>
-
-        <section id="projects">
-            <h2>Projects Showcase</h2>
-            <div class="project-grid">
-                <div class="project-card">
-                    <img src="6.jpg" alt="Project 1">
-                    <h3>YOUR PORTFOLIO</h3>
-                    <p>Short description of the project.</p>
-                </div>
-                <!-- Additional project cards -->
+    <div class="container">
+        <h1>Upload Video for Prediction</h1>
+        <form id="prediction-form" enctype="multipart/form-data">
+            <div class="input-group">
+                <label for="video-file">Choose a video file:</label>
+                <input type="file" id="video-file" name="video" accept="video/*" required>
             </div>
-        </section>
-    </main>
+            <div class="video-preview">
+                <label for="video-preview">Video Preview:</label>
+                <video id="video-player" controls></video>
+            </div>
+            <button type="button" id="predict-button">Predict</button>
+        </form>
+        <div class="progress-container">
+            <div class="progress-item">
+                <label for="progress-meter1">Model 1 Progress:</label>
+                <progress id="progress-meter1" max="100" value="0"></progress>
+            </div>
+            <div class="progress-item">
+                <label for="progress-meter2">Model 2 Progress:</label>
+                <progress id="progress-meter2" max="100" value="0"></progress>
+            </div>
+        </div>
+        <div id="prediction-result"></div>
+    </div>
 
-    <footer>
-        <p>&copy; 2024 Your Name. All rights reserved.</p>
-    </footer>
-
-    <script src="p.js"></script>
+    <script>
+        document.getElementById('video-file').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const videoPlayer = document.getElementById('video-player');
+                videoPlayer.src = URL.createObjectURL(file);
+                videoPlayer.load();
+            }
+        });
+        document.getElementById('predict-button').addEventListener('click', function () {
+            const formData = new FormData();
+            const fileInput = document.getElementById('video-file');
+            const file = fileInput.files[0];
+        
+            if (!file) {
+                alert('Please select a video file before prediction.');
+                return;
+            }
+        
+            formData.append('file', file);
+        
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://diya-minor-3.onrender.com/process_video/', true);
+        
+            xhr.setRequestHeader("Content-Type", "multipart/form-data"); // Ensure content type for file upload
+        
+            xhr.addEventListener('load', function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        const model1Percentage = response.model1_average_count;
+                        const model2Percentage = response.model2_average_count;
+        
+                        // Update progress meters
+                        document.getElementById('progress-meter1').value = model1Percentage;
+                        document.getElementById('progress-meter2').value = model2Percentage;
+        
+                        // Display result
+                        document.getElementById('prediction-result').innerText =
+                            `Model 1: ${model1Percentage}% | Model 2: ${model2Percentage}%`;
+                    } catch (error) {
+                        console.error('Error parsing JSON response:', error, xhr.responseText);
+                        document.getElementById('prediction-result').innerText =
+                            'Unexpected response format. Check console for details.';
+                    }
+                } else if (xhr.status === 422) {
+                    alert('The server rejected the file. Please check the file format and size.');
+                    console.error('Server responded with status 422. Response:', xhr.responseText);
+                } else {
+                    console.error('API responded with an error:', xhr.status, xhr.statusText, xhr.responseText);
+                    document.getElementById('prediction-result').innerText =
+                        `Error in processing the video. Server responded with status: ${xhr.status}`;
+                }
+            });
+        
+            xhr.addEventListener('error', function () {
+                console.error('Network error occurred. Check your connection or server availability.');
+                document.getElementById('prediction-result').innerText = 'Failed to connect to the server.';
+            });
+        
+            console.log('Sending video to API...');
+            xhr.send(formData);
+        });
+        
+        
+        
+    </script>
 </body>
 </html>
