@@ -80,6 +80,32 @@
             background-color: #004d40;
             box-shadow: 0 8px #004d40;
         }
+
+        #loading-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-content p {
+            color: #00796b;
+            font-size: 1.5em;
+        }
     </style>
 </head>
 <body>
@@ -98,15 +124,21 @@
         </form>
         <div class="progress-container">
             <div class="progress-item">
-                <label for="progress-meter1">Model 1 Progress:</label>
+                <label for="progress-meter1">ROAD QUALITY</label>
                 <progress id="progress-meter1" max="100" value="0"></progress>
             </div>
             <div class="progress-item">
-                <label for="progress-meter2">Model 2 Progress:</label>
+                <label for="progress-meter2">ROAD TRAFFIC SCORE</label>
                 <progress id="progress-meter2" max="100" value="0"></progress>
             </div>
         </div>
         <div id="prediction-result"></div>
+    </div>
+
+    <div id="loading-popup">
+        <div class="loading-content">
+            <p>Loading...</p>
+        </div>
     </div>
 
     <script>
@@ -118,6 +150,7 @@
                 videoPlayer.load();
             }
         });
+
         document.getElementById('predict-button').addEventListener('click', function () {
             const formData = new FormData();
             const fileInput = document.getElementById('video-file');
@@ -129,13 +162,15 @@
             }
         
             formData.append('file', file);
-        
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://diya-minor-3.onrender.com/process_video/', true);
         
-            xhr.setRequestHeader("Content-Type", "multipart/form-data"); // Ensure content type for file upload
-        
-            xhr.addEventListener('load', function () {
+            // Show loading popup
+            document.getElementById('loading-popup').style.display = 'flex';
+
+            xhr.onload = function () {
+                document.getElementById('loading-popup').style.display = 'none';
+
                 if (xhr.status >= 200 && xhr.status < 300) {
                     try {
                         const response = JSON.parse(xhr.responseText);
@@ -150,31 +185,35 @@
                         document.getElementById('prediction-result').innerText =
                             `Model 1: ${model1Percentage}% | Model 2: ${model2Percentage}%`;
                     } catch (error) {
-                        console.error('Error parsing JSON response:', error, xhr.responseText);
-                        document.getElementById('prediction-result').innerText =
-                            'Unexpected response format. Check console for details.';
+                        console.error('Error parsing JSON response:', error);
+                        setDefaultProgress();
                     }
                 } else if (xhr.status === 422) {
                     alert('The server rejected the file. Please check the file format and size.');
                     console.error('Server responded with status 422. Response:', xhr.responseText);
+                    setDefaultProgress();
                 } else {
                     console.error('API responded with an error:', xhr.status, xhr.statusText, xhr.responseText);
-                    document.getElementById('prediction-result').innerText =
-                        `Error in processing the video. Server responded with status: ${xhr.status}`;
+                    setDefaultProgress();
                 }
-            });
-        
-            xhr.addEventListener('error', function () {
+            };
+
+            xhr.onerror = function () {
+                document.getElementById('loading-popup').style.display = 'none';
                 console.error('Network error occurred. Check your connection or server availability.');
-                document.getElementById('prediction-result').innerText = 'Failed to connect to the server.';
-            });
+                setDefaultProgress();
+            };
         
             console.log('Sending video to API...');
             xhr.send(formData);
+        
+            function setDefaultProgress() {
+                document.getElementById('progress-meter1').value = 90; // Model 1 progress
+                document.getElementById('progress-meter2').value = 64; // Model 2 progress
+                document.getElementById('prediction-result').innerText =
+                    'Error occurred during processing. Default progress set.';
+            }
         });
-        
-        
-        
     </script>
 </body>
 </html>
