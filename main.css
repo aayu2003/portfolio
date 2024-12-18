@@ -1,0 +1,36 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  font-size: 14px;
+}
+.v1_3 {
+  width: 412px;
+  height: 917px;
+  background: rgba(255,255,255,1);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: hidden;
+}
+.v1_4 {
+  width: 319px;
+  height: 266px;
+  background: rgba(217,217,217,1);
+  opacity: 1;
+  position: absolute;
+  top: 111px;
+  left: 42px;
+  overflow: hidden;
+}
+.v1_5 {
+  width: 309px;
+  height: 299px;
+  background: rgba(217,217,217,1);
+  opacity: 1;
+  position: absolute;
+  top: 424px;
+  left: 52px;
+  overflow: hidden;
+}
