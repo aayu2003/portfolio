@@ -3,77 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Login Page</title>
+    <title>TRANSACTION</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+        /* General Reset */
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: #002970; /* Dark blue */
+            color: white;
+            padding: 15px 20px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            height: 100vh;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 350px;
+
+        nav .logo {
+            font-size: 1.5em;
+            font-weight: bold;
         }
-        .container h2 {
-            text-align: center;
-            color: #333;
+
+        nav ul {
+            display: flex;
+            list-style: none;
         }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+
+        nav ul li {
+            margin: 0 15px;
         }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
-            color: #fff;
+
+        nav ul li button {
+            background-color: #00baf2;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            text-decoration: none;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        nav ul li button:hover {
+            background-color: #0097d3;
         }
-        .signup-link {
+
+        /* Scrollable Top Cards Section */
+        .top-scrollable-section {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 20px 0;
+            background-color: #e8f6ff;
+        }
+
+        .top-card-container {
+            display: inline-flex;
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        .top-card {
+            display: inline-block;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            width: 230px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-top: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .top-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .top-card h2 {
+            font-size: 2em;
+            color: #002970;
+            margin-bottom: 10px;
+        }
+
+        .top-card p {
+            font-size: 0.9em;
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .add-card-btn {
+            background-color: #00baf2;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .add-card-btn:hover {
+            background-color: #0097d3;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #002970;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        footer p {
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>School Login</h2>
-        <form>
-            <label for="role">You are:</label>
-            <select id="role" name="role" required>
-                <option value="" disabled selected>Choose your role</option>
-                <option value="principal">Principal</option>
-                <option value="teacher">Teacher</option>
-                <option value="student">Student</option>
-            </select>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo">TRANSACTIONS</div>
+        <ul>
+            <li><button onclick="addTopCard()">ADD</button></li>
+        </ul>
+    </nav>
 
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-
-            <button type="submit">Login</button>
-        </form>
-        <div class="signup-link">
-            <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+    <!-- Top Scrollable Cards Section -->
+    <section class="top-scrollable-section">
+        <div class="top-card-container" id="topCardContainer">
+            <div class="top-card">
+                <h2>₹500</h2>
+                <p>Recipient: John Doe</p>
+                <p>Payment Date: 2024-08-20</p>
+                <p>Status: Pending</p>
+                <p>Reference: #12345</p>
+            </div>
+            <div class="top-card">
+                <h2>₹1200</h2>
+                <p>Recipient: Jane Smith</p>
+                <p>Payment Date: 2024-08-21</p>
+                <p>Status: Completed</p>
+                <p>Reference: #12346</p>
+            </div>
         </div>
-    </div>
+        <button class="add-card-btn" onclick="addTopCard()">+ Add New Payment</button>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>TIGER CUB PREPRIMARY SCHOOL</p>
+    </footer>
+
+    <!-- JavaScript for Adding New Cards -->
+    <script>
+        function addTopCard() {
+            const container = document.getElementById('topCardContainer');
+            const newCard = document.createElement('div');
+            newCard.className = 'top-card';
+            newCard.innerHTML = `
+                <h2>₹${Math.floor(Math.random() * 2000) + 500}</h2>
+                <p>Recipient: New User</p>
+                <p>Payment Date: ${new Date().toISOString().split('T')[0]}</p>
+                <p>Status: Pending</p>
+                <p>Reference: #${Math.floor(Math.random() * 100000)}</p>
+            `;
+            container.appendChild(newCard);
+            container.scrollLeft += 250; // Scroll smoothly to the new card
+        }
+    </script>
 </body>
 </html>
